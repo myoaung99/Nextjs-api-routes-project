@@ -1,33 +1,20 @@
-import { connectDatabase, insertDocument } from '../../helpers/db-util';
+import fs from "fs";
+import path from "path";
+import process from "process";
 
-async function handler(req, res) {
-  if (req.method === 'POST') {
-    const userEmail = req.body.email;
+const handler = (req, res) => {
+  if (req.method === "POST") {
+    const email = req.body.email;
 
-    if (!userEmail || !userEmail.includes('@')) {
-      res.status(422).json({ message: 'Invalid email address.' });
-      return;
-    }
-
-    let client;
-
-    try {
-      client = await connectDatabase();
-    } catch (error) {
-      res.status(500).json({ message: 'Connecting to the database failed!' });
-      return;
-    }
-
-    try {
-      await insertDocument(client, 'newsletter', { email: userEmail });
-      client.close();
-    } catch (error) {
-      res.status(500).json({ message: 'Inserting data failed!' });
-      return;
-    }
-
-    res.status(201).json({ message: 'Signed up!' });
+    const filePath = path.join(process.cwd(), "data", "newsletter-signup.json");
+    const fileData = fs.readFileSync(filePath);
+    const data = JSON.parse(fileData);
+    data.push(email);
+    fs.writeFileSync(filePath, JSON.stringify(data));
+    res.status(201).json({ staus: "SUCCESS", email });
+  } else {
+    res.status(404).json({ message: "Sorry!!" });
   }
-}
+};
 
 export default handler;
