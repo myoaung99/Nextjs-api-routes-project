@@ -17,36 +17,38 @@ function Comments(props) {
 
   // handler function
   const addCommentHandler = (data) => {
-    fetch("/api/comment", {
+    fetch(`/api/comment/${eventId}`, {
       method: "POST",
-      body: JSON.stringify({ id: eventId, ...data }),
+      body: JSON.stringify({ ...data }),
       headers: {
         "Content-Type": "application/json",
       },
     })
       .then((response) => response.json())
       .then((data) => {
-        setEventComments(data);
+        console.log(data);
       });
   };
 
   // helper function
-  const setEventComments = (data) => {
-    const eventCmt = data.comment.filter(
-      (comment) => comment.eventId === eventId
-    );
+  const setEventComment = (comments) => {
+    const eventCmt = comments.filter((comment) => comment.eventId === eventId);
     setComments(eventCmt);
   };
 
+  // get comments to display
   useEffect(() => {
-    fetch("/api/comment")
+    fetch("/api/comment/" + eventId)
       .then((response) => response.json())
       .then((data) => {
-        if (data.comment.length > 0) {
-          setEventComments(data);
+        if (data.comments.length > 0) {
+          console.log(data.comments);
+          setEventComment(data.comments);
         }
       });
   }, []);
+
+  console.log(comments);
 
   return (
     <section className={classes.comments}>
