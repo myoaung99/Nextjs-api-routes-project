@@ -1,34 +1,16 @@
-import { MongoClient } from "mongodb";
-
-const connectDatabase = async () => {
-  const client = await MongoClient.connect(
-    "mongodb+srv://myomyintaung:myomyintaung2112@cluster0.n4m0q.mongodb.net/?retryWrites=true&w=majority"
-  );
-  return client;
-};
-
-const insertDocument = async (client, document) => {
-  const db = client.db("events");
-  console.log("insert" + document);
-  const result = await db.collection("comments").insertOne({ ...document });
-  return result;
-};
-
-const getDocuments = async (client) => {
-  const db = client.db("events");
-  const documents = await db
-    .collection("comments")
-    .find({})
-    .sort({ _id: -1 })
-    .toArray();
-
-  return documents;
-};
+import {
+  connectDatabase,
+  getDocuments,
+  insertDocument,
+} from "../../../helpers/db-util";
 
 const handler = async (req, res) => {
   let client;
+
+  console.log("handler");
   try {
     client = await connectDatabase();
+    console.log("Connected to database");
   } catch (error) {
     res
       .status(500)
@@ -57,10 +39,9 @@ const handler = async (req, res) => {
     const newComment = { eventId, email, name, text };
 
     try {
-      const result = await insertDocument(client, newComment);
+      const result = await insertDocument(client, "comments", newComment);
       newComment.id = result.insertedId;
       res.status(201).json({ status: "SUCCESS", comment: newComment });
-      client.close();
     } catch (error) {
       res.status(502).json({ status: "FAIL", message: "Failed to send data" });
     }
@@ -68,13 +49,15 @@ const handler = async (req, res) => {
 
   if (req.method === "GET") {
     try {
-      const documents = await getDocuments(client);
+      const documents = await getDocuments(client, "comments", { _id: -1 });
+      console.log(documents);
       res.status(200).json({ status: "SUCCESS", comments: documents });
-      client.close();
     } catch (error) {
       res.status(502).json({ status: "FAIL", message: "Failed to send data " });
     }
   }
+
+  client.close();
 };
 
 export default handler;

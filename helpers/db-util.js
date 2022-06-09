@@ -1,29 +1,25 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient } from "mongodb";
 
-export async function connectDatabase() {
+export const connectDatabase = async () => {
   const client = await MongoClient.connect(
-    'mongodb+srv://maximilian:8ZO3ycZqJ23kWBQx@cluster0.ntrwp.mongodb.net/events?retryWrites=true&w=majority'
+    "mongodb+srv://myomyintaung:myomyintaung2112@cluster0.n4m0q.mongodb.net/?retryWrites=true&w=majority"
   );
-
   return client;
-}
+};
 
-export async function insertDocument(client, collection, document) {
-  const db = client.db();
-
-  const result = await db.collection(collection).insertOne(document);
-
+export const insertDocument = async (client, collection, document) => {
+  const db = client.db("events");
+  const result = await db.collection(collection).insertOne({ ...document });
   return result;
-}
+};
 
-export async function getAllDocuments(client, collection, sort) {
-  const db = client.db();
-
+export const getDocuments = async (client, collection, sort) => {
+  const db = client.db("events");
   const documents = await db
     .collection(collection)
-    .find()
+    .find({})
     .sort(sort)
     .toArray();
 
   return documents;
-}
+};

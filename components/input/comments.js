@@ -9,7 +9,7 @@ function Comments(props) {
 
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
-  const [addedComment, setAddedComment] = useState(false);
+  const [cmtAdded, setCmtAdded] = useState(false);
 
   // handler function
   const toggleCommentsHandler = () => {
@@ -27,29 +27,28 @@ function Comments(props) {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        setCmtAdded(true);
       });
   };
 
   // helper function
   const setEventComment = (comments) => {
     const eventCmt = comments.filter((comment) => comment.eventId === eventId);
-    console.log(comments);
     setComments(eventCmt);
   };
 
   // get comments to display
   useEffect(() => {
+    console.log("in use effect");
     fetch("/api/comment/" + eventId)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         if (data.comments.length > 0) {
           setEventComment(data.comments);
         }
       });
-  }, [addedComment]);
-
-  console.log(comments);
+  }, [cmtAdded]);
 
   return (
     <section className={classes.comments}>
