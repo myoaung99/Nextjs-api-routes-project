@@ -1,11 +1,40 @@
 import { MongoClient } from "mongodb";
 
-const handler = async (req, res) => {
-  // connection url
-  const url =
-    "mongodb+srv://myomyintaung:myomyintaung2112@cluster0.n4m0q.mongodb.net/?retryWrites=true&w=majority";
+const connectDatabase = async () => {
+  const client = await MongoClient.connect(
+    "mongodb+srv://myomyintaung:myomyintaung2112@cluster0.n4m0q.mongodb.net/?retryWrites=true&w=majority"
+  );
+  return client;
+};
 
-  const client = await MongoClient.connect(url);
+const insertDocument = async (client, document) => {
+  const db = client.db("events");
+  console.log("insert" + document);
+  const result = await db.collection("comments").insertOne({ ...document });
+  return result;
+};
+
+const getDocuments = async (client) => {
+  const db = client.db("events");
+  const documents = await db
+    .collection("comments")
+    .find({})
+    .sort({ _id: -1 })
+    .toArray();
+
+  return documents;
+};
+
+const handler = async (req, res) => {
+  let client;
+  try {
+    client = await connectDatabase();
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "FAIL", message: "Connecting to database fail" });
+    return;
+  }
 
   if (req.method === "POST") {
     const eventId = req.query.eventId;
@@ -27,27 +56,25 @@ const handler = async (req, res) => {
 
     const newComment = { eventId, email, name, text };
 
-    const db = client.db("events");
-
-    const result = await db.collection("comments").insertOne({ ...newComment });
-
-    console.log(result);
-
-    newComment.id = result.insertedId;
-    res.status(201).json({ status: "SUCCESS", comment: newComment });
+    try {
+      const result = await insertDocument(client, newComment);
+      newComment.id = result.insertedId;
+      res.status(201).json({ status: "SUCCESS", comment: newComment });
+      client.close();
+    } catch (error) {
+      res.status(502).json({ status: "FAIL", message: "Failed to send data" });
+    }
   }
 
   if (req.method === "GET") {
-    const db = client.db("events");
-    const documents = await db
-      .collection("comments")
-      .find()
-      .sort({ _id: -1 }) // sort by descending (last comments appear first)
-      .toArray();
-    res.status(200).json({ status: "SUCCESS", comments: documents });
+    try {
+      const documents = await getDocuments(client);
+      res.status(200).json({ status: "SUCCESS", comments: documents });
+      client.close();
+    } catch (error) {
+      res.status(502).json({ status: "FAIL", message: "Failed to send data " });
+    }
   }
-
-  client.close();
 };
 
 export default handler;
