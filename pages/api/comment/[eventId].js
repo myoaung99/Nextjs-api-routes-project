@@ -6,8 +6,6 @@ import {
 
 const handler = async (req, res) => {
   let client;
-
-  console.log("handler");
   try {
     client = await connectDatabase();
     console.log("Connected to database");
