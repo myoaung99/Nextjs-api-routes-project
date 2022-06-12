@@ -12,7 +12,7 @@ const handler = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ status: "FAIL", message: "Connecting to database fail" });
+      .json({ status: "error", message: "Connecting to database fail" });
     return;
   }
 
@@ -30,7 +30,7 @@ const handler = async (req, res) => {
       !text ||
       text.trim() === ""
     ) {
-      res.status(422).json({ message: "Invalid comment" });
+      res.status(422).json({ status: "error", message: "Invalid comment" });
       return;
     }
 
@@ -39,19 +39,21 @@ const handler = async (req, res) => {
     try {
       const result = await insertDocument(client, "comments", newComment);
       newComment.id = result.insertedId;
-      res.status(201).json({ status: "SUCCESS", comment: newComment });
+      res.status(201).json({ status: "success", comment: newComment });
     } catch (error) {
-      res.status(502).json({ status: "FAIL", message: "Failed to send data" });
+      res.status(502).json({ status: "error", message: "Failed to send data" });
     }
   }
 
   if (req.method === "GET") {
     try {
-      const documents = await getDocuments(client, "comments", { _id: -1 });
-      console.log(documents);
-      res.status(200).json({ status: "SUCCESS", comments: documents });
+      const sortDescending = { _id: -1 };
+      const documents = await getDocuments(client, "comments", sortDescending);
+      res.status(200).json({ status: "success", comments: documents });
     } catch (error) {
-      res.status(502).json({ status: "FAIL", message: "Failed to send data " });
+      res
+        .status(502)
+        .json({ status: "error", message: "Failed to send data " });
     }
   }
 

@@ -19,6 +19,7 @@ function HomePage(props) {
   );
 }
 
+// pre-loading with seo-required data
 export async function getStaticProps() {
   const featuredEvents = await getFeaturedEvents();
 

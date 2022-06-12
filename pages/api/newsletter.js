@@ -14,16 +14,16 @@ const handler = async (req, res) => {
     } catch (error) {
       res
         .status(500)
-        .json({ status: "FAIL", message: "Connection to database failed." });
+        .json({ status: "error", message: "Connection to database failed." });
       return;
     }
 
     try {
       await insertDocument(client, "newsletter", { email });
-      res.status(201).json({ staus: "SUCCESS", email });
+      res.status(201).json({ staus: "success", email });
       client.close();
     } catch (error) {
-      res.status(502).json({ status: "FAIL", message: "Fail to insert data" });
+      res.status(502).json({ status: "error", message: "Fail to insert data" });
     }
   }
 };

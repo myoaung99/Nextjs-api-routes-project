@@ -3,14 +3,15 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 import Head from "next/head";
 
-import { getFilteredEvents } from "../../helpers/api-util";
 import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
 
-function FilteredEventsPage(props) {
+function FilteredEventsPage() {
   const [loadedEvents, setLoadedEvents] = useState();
+
+  // next/router for dynmic route
   const router = useRouter();
 
   // empty on initial load
@@ -43,6 +44,7 @@ function FilteredEventsPage(props) {
     </Head>
   );
 
+  // first evaluation
   if (!loadedEvents) {
     return (
       <Fragment>
@@ -55,6 +57,7 @@ function FilteredEventsPage(props) {
   const filteredYear = filterData[0];
   const filteredMonth = filterData[1];
 
+  // convert to number type
   const numYear = +filteredYear;
   const numMonth = +filteredMonth;
 

@@ -3,7 +3,6 @@ import NotificationContext from "../../store/notification-context";
 import classes from "./newsletter-registration.module.css";
 
 function NewsletterRegistration() {
-  const [submitting, setSubmitting] = useState(false);
   const emailInputRef = useRef();
 
   const notiCtx = useContext(NotificationContext);
@@ -12,7 +11,7 @@ function NewsletterRegistration() {
     event.preventDefault();
 
     const enteredEmail = emailInputRef.current.value;
-    setSubmitting(true);
+
     notiCtx.showNotification({
       title: "Newsletter Registration",
       message: "Registrating email",
@@ -25,10 +24,18 @@ function NewsletterRegistration() {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          response.json();
+        }
+
+        throw new Error(
+          response.statusText || "Something went wrong in subscribing."
+        );
+      })
       .then((data) => {
         console.log(data);
-        setSubmitting(false);
+
         notiCtx.showNotification({
           title: "Newsletter Registration",
           message: "Registered successfully",
@@ -56,7 +63,7 @@ function NewsletterRegistration() {
             aria-label="Your email"
             ref={emailInputRef}
           />
-          <button>{submitting ? "Sending..." : "Register"}</button>
+          <button>Register</button>
         </div>
       </form>
     </section>

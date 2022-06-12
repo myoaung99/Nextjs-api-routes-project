@@ -16,7 +16,7 @@ export const NotificationProvider = (props) => {
         activeNotification.status === "success"
       ) {
         const timer = setTimeout(() => {
-          hideNotificationHandler();
+          setActiveNotification(null);
         }, 3000);
 
         return () => {

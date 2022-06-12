@@ -9,12 +9,16 @@ import classes from "./event-item.module.css";
 function EventItem(props) {
   const { title, image, date, location, id } = props;
 
+  // convert to DD/MM/YY format
   const humanReadableDate = new Date(date).toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
+
   const formattedAddress = location.replace(", ", "\n");
+
+  // nextjs link/href
   const exploreLink = `/events/${id}`;
 
   return (

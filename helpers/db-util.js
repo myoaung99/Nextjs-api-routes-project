@@ -8,7 +8,7 @@ export const connectDatabase = async () => {
 };
 
 export const insertDocument = async (client, collection, document) => {
-  const db = client.db("events");
+  const db = client.db("events"); // db(dbName)
   const result = await db.collection(collection).insertOne({ ...document });
   return result;
 };
